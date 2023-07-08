@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -14,15 +15,10 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String NEWS_TITLE = "news_title";
-    private static final String NEWS_AUTHOR = "news_author";
-
-    /*使⽤ List<Map<String, String> > dataList; 替换掉之前定义的
-    titles、authors 数组。将数据源的构造操作放⼊initData()⽅法中*/
-    private List<Map<String, String>> dataList =  new ArrayList<>();
+    public static final String NEWS_ID = "news_id";
+    private List<News> newsList = new ArrayList<>();
     private String[] titles;
     private String[] authors;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,31 +27,34 @@ public class MainActivity extends AppCompatActivity {
 
         initData();
 
-        SimpleAdapter simpleAdapter = new SimpleAdapter(
-                this, dataList, android.R.layout.simple_list_item_2,
-                new String[] { NEWS_TITLE, NEWS_AUTHOR },
-                new int[] { android.R.id.text1, android.R.id.text2});
+        NewsAdapter newsAdapter = new NewsAdapter(MainActivity.this,
+                R.layout.list_item, newsList);
 
-        ListView listView = findViewById(R.id.lv_news_list);
-        listView.setAdapter(simpleAdapter);
+        ListView lvNewsList = findViewById(R.id.lv_news_list);
+
+        lvNewsList.setAdapter(newsAdapter);
     }
 
     private void initData() {
         int length;
+
         titles = getResources().getStringArray(R.array.titles);
         authors = getResources().getStringArray(R.array.authors);
+        TypedArray images = getResources().obtainTypedArray(R.array.images);
 
-        if(titles.length > authors.length) {
+        if (titles.length > authors.length) {
             length = authors.length;
         } else {
             length = titles.length;
         }
 
-        for(int i = 0; i < length; i++) {
-            Map map = new HashMap();
-            map.put(NEWS_TITLE, titles[i]);
-            map.put(NEWS_AUTHOR, authors[i]);
-            dataList.add(map);
+        for (int i = 0; i < length; i++) {
+            News news = new News();
+            news.setTitle(titles[i]);
+            news.setAuthor(authors[i]);
+            news.setImageId(images.getResourceId(i, 0));
+
+            newsList.add(news);
         }
     }
 }
