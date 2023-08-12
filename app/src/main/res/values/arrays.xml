@@ -43,6 +43,16 @@
         <item>Gargi Pant</item>
     </string-array>
 
+    <string-array name="contents">
+        <item>Content 1</item>
+        <item>Content 2</item>
+        <item>Content 3</item>
+        <item>Content 4</item>
+        <item>Content 5</item>
+        <item>Content 6</item>
+
+    </string-array>
+
     <string-array name="images">
         <item>@drawable/img_01</item>
         <item>@drawable/img_02</item>
