@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Typeface;
@@ -99,40 +100,63 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     //登录按钮点击事件，如果勾选保存密码，将信息存入SharedPreferences
     public void onClick(View view) {
         if (view.getId() == R.id.bt_login) {
-            Toast.makeText(getApplicationContext(),"登录成功",Toast.LENGTH_SHORT).show();
-            String spFileName = getResources()
-                    .getString(R.string.shared_preferences_file_name);
-            String accountKey = getResources()
-                    .getString(R.string.login_account_name);
-            String passwordKey =  getResources()
-                    .getString(R.string.login_password);
-            String rememberPasswordKey = getResources()
-                    .getString(R.string.login_remember_password);
+            String username = etAccount.getText().toString();
+            String password = etPwd.getText().toString();
 
-            //创建一个SharedPreferences对象
-            //Context.MODE_PRIVATE是一个访问模式的常量，用于指定SharedPreferences文件的访问权限
-            //当前表示只有当前应用程序能访问SharedPreferences，其他程序不能访问修改
-            SharedPreferences spFile = getSharedPreferences(
-                    spFileName,
-                    Context.MODE_PRIVATE);
-            //获取编辑对象
-            SharedPreferences.Editor editor = spFile.edit();
+            //查询数据库以检查用户名和密码是否匹配
+            DatabaseHelper dbHelper = new DatabaseHelper(this);
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-            if(cbRememberPwd.isChecked()){
-                String password = etPwd.getText().toString();
-                String account = etAccount.getText().toString();
+            String[] projection = {
+                    dbHelper.getColumnUsername(),
+            };
+            String selection = dbHelper.getColumnUsername() + " = ? AND " +
+                    dbHelper.getColumnPassword() + " = ?";
+            String[] selectionArgs = {username,  password};
 
-                editor.putString(accountKey,account);
-                editor.putString(passwordKey,password);
-                editor.putBoolean(rememberPasswordKey,true);
-                //只有调用apply()或commit()方法之后，对SharedPreferences的修改才会生效
-                editor.apply();
+            Cursor cursor = db.query(
+                    dbHelper.getTableName(),
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    null);
+
+            if (cursor.moveToFirst()) {
+                //成功登录
+                Toast.makeText(getApplicationContext(),"Login successful.",Toast.LENGTH_SHORT).show();
+
+                //储存登录信息到sharedPreferences中
+                String spFileName = getResources()
+                        .getString(R.string.shared_preferences_file_name);
+                String accountKey = getResources()
+                        .getString(R.string.login_account_name);
+                String passwordKey =  getResources()
+                        .getString(R.string.login_password);
+
+                SharedPreferences spFile = getSharedPreferences(spFileName, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = spFile.edit();
+
+                if (cbRememberPwd.isChecked()) {
+                    editor.putString(accountKey, username);
+                    editor.putString(passwordKey, password);
+                    editor.apply();
+                } else {
+                    editor.remove(accountKey);
+                    editor.remove(passwordKey);
+                    editor.apply();
+                }
+
+                //可以在这里导航到下一个活动或执行其他操作
             } else {
-                editor.remove(accountKey);
-                editor.remove(passwordKey);
-                editor.remove(rememberPasswordKey);
-                editor.apply();
+                //登录失败
+                Toast.makeText(this, "登录失败",Toast.LENGTH_SHORT).show();
             }
+
+            cursor.close();
+            db.close();
+
         }
         if (view.getId() == R.id.bt_register) {
             String account = etAccount.getText().toString();
