@@ -1,148 +1,128 @@
-//package com.example.myapplication;
-//
-//import androidx.appcompat.app.AppCompatActivity;
-//
-//import android.content.res.TypedArray;
-//import android.os.Bundle;
-//import android.widget.ArrayAdapter;
-//import android.widget.ListView;
-//import android.widget.SimpleAdapter;
-//
-//import java.util.ArrayList;
-//import java.util.HashMap;
-//import java.util.List;
-//import java.util.Map;
-//
-//public class MainActivity extends AppCompatActivity {
-//
-//    public static final String NEWS_ID = "news_id";
-//    private List<News> newsList = new ArrayList<>();
-//    private String[] titles;
-//    private String[] authors;
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//
-//        initData();
-//
-//        NewsAdapter newsAdapter = new NewsAdapter(MainActivity.this,
-//                R.layout.list_item, newsList);
-//
-//        ListView lvNewsList = findViewById(R.id.lv_news_list);
-//
-//        lvNewsList.setAdapter(newsAdapter);
-//    }
-//
-//    private void initData() {
-//        int length;
-//
-//        titles = getResources().getStringArray(R.array.titles);
-//        authors = getResources().getStringArray(R.array.authors);
-//        TypedArray images = getResources().obtainTypedArray(R.array.images);
-//
-//        if (titles.length > authors.length) {
-//            length = authors.length;
-//        } else {
-//            length = titles.length;
-//        }
-//
-//        for (int i = 0; i < length; i++) {
-//            News news = new News();
-//            news.setTitle(titles[i]);
-//            news.setAuthor(authors[i]);
-//            news.setImageId(images.getResourceId(i, 0));
-//
-//            newsList.add(news);
-//        }
-//    }
-//}
-
 package com.example.myapplication;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.AlertDialog;
-import android.content.res.TypedArray;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
+import android.provider.MediaStore;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
+
 import java.util.List;
-import java.util.Map;
+import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String NEWS_ID = "news_id";
-    private List<News> newsList = new ArrayList<>();
-    private String[] titles;
-    private String[] authors;
-    private MySQLiteOpenHelper myDbHelper;
-    private SQLiteDatabase db;
-    private News news;
-    private ListView lvNewsList;
-
+    private BottomNavigationView bottomNavigationView;
+    private RecyclerView photoGallery;
+    private GalleryAdapter galleryAdapter;
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private List<PhotoItem> photoItemList; // 存储图片项数据列表
+    private int selectedPhotoPosition = -1; // 用于跟踪用户选择的图片位置
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ListView lvNewsList = findViewById(R.id.lvNewsList);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Fragment selectedFragment = null;
 
-        myDbHelper = new MySQLiteOpenHelper(MainActivity.this);
-        db = myDbHelper.getReadableDatabase();
-        Cursor cursor = db.query(
-                NewsContract.NewsEntry.TABLE_NAME,
-                null, null, null, null, null, null);
+//                switch (item.getItemId()) {
+//                    case R.id.navigation_home:
+//                        selectedFragment = new HomeFragment();
+//                        break;
+//                    case R.id.navigation_upload:
+//                        selectedFragment = new UploadFragment();
+//                        break;
+//                    case R.id.navigation_profile:
+//                        selectedFragment = new ProfileFragment();
+//                        break;
+//                }
 
-        List<News> newsList = new ArrayList<>();
-
-        int titleIndex = cursor.getColumnIndex(
-                NewsContract.NewsEntry.COLUMN_NAME_TITLE);
-        int authorIndex = cursor.getColumnIndex(
-                NewsContract.NewsEntry.COLUMN_NAME_AUTHOR);
-        int imageIndex = cursor.getColumnIndex(
-                NewsContract.NewsEntry.COLUMN_NAME_IMAGE);
-
-        while (cursor.moveToNext()) {
-            News news = new News();
-
-            String title = cursor.getString(titleIndex);
-            String author = cursor.getString(authorIndex);
-            //String image = cursor.getString(imageIndex);
-            String imageFileName = cursor.getString(imageIndex);
-
-            Log.d("ImageTest", "Image File Name: " + imageFileName);
-            int resourceId = getResources().getIdentifier(imageFileName, "drawable", getPackageName());
-            Log.d("ImageTest", "Image Resource ID: " + resourceId);
+                if (item.getItemId() == R.id.navigation_home) {
+                    selectedFragment = new HomeFragment();
+                } else if (item.getItemId() == R.id.navigation_upload) {
+                    selectedFragment = new UploadFragment();
+                } else if (item.getItemId() == R.id.navigation_profile) {
+                    selectedFragment = new ProfileFragment();
+                }
 
 
-            // 将资源ID解码成Bitmap对象
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resourceId);
-            //Bitmap bitmap = BitmapFactory.decodeStream(
-             //       getClass().getResourceAsStream("/" + image));
+                if (selectedFragment != null) {
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+                }
 
-            news.setTitle(title);
-            news.setAuthor(author);
-            news.setImageId(bitmap);
-            newsList.add(news);
-        }
+                return true;
+            }
+        });
 
-        NewsAdapter newsAdapter = new NewsAdapter(
-                MainActivity.this,
-                R.layout.list_item,
-                newsList);
-        lvNewsList.setAdapter(newsAdapter);
+        // 默认选择主页
+        //bottomNavigationView.setSelectedItemId(R.id.navigation_home);
+
+        // 初始化RecyclerView
+        photoGallery = findViewById(R.id.photo_gallery);
+        photoGallery.setLayoutManager(new LinearLayoutManager(this));
+
+        // 创建示例的图片项数据列表
+        List<PhotoItem> photoItemList = new ArrayList<>();
+        photoItemList.add(new PhotoItem(Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.img_01), "Author 1", 10));
+        photoItemList.add(new PhotoItem(Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.img_02), "Author 2", 15));
+
+        // 添加更多图片项...
+
+        // 创建并设置适配器，传递数据列表
+        galleryAdapter = new GalleryAdapter(photoItemList);
+        photoGallery.setAdapter(galleryAdapter);
+
+//        // 上传图片按钮点击事件
+//        Button uploadButton = findViewById(R.id.upload_button);
+//        uploadButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // 启动图片选择器
+//                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                startActivityForResult(intent, PICK_IMAGE_REQUEST);
+//            }
+//        });
+
+        // 添加点赞和评论功能的代码将在下面的步骤中添加
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            // 获取选择的图片的URI
+            Uri selectedImageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.img_01); // 用于测试，您可以替换为实际的URI
+
+
+            // 创建新的图片项并添加到列表
+            PhotoItem newPhotoItem = new PhotoItem(selectedImageUri, "New Author", 0); // 0表示初始点赞数
+            photoItemList.add(0, newPhotoItem); // 添加到列表顶部
+            galleryAdapter.notifyItemInserted(0); // 刷新适配器以更新UI
+        }
+    }
+
+
 
 }
