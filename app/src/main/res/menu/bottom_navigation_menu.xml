@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_home"
+        android:title="主页"
+        android:icon="@drawable/ic_home" />
+    <item
+        android:id="@+id/navigation_upload"
+        android:title="上传"
+        android:icon="@drawable/ic_upload" />
+    <item
+        android:id="@+id/navigation_profile"
+        android:title="个人资料"
+        android:icon="@drawable/ic_profile" />
+</menu>
