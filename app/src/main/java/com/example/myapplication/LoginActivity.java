@@ -1,10 +1,14 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -31,7 +35,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login2);
-
+//获取权限
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.INTERNET},
+                    1);
+        }
+//
         final ImageView ivPwdSwitch = findViewById(R.id.iv_pwd_switch);
         etPwd = findViewById(R.id.et_pwd);
         etAccount = findViewById(R.id.et_account);
@@ -48,7 +59,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onClick(View view) {
                 bPwdSwitch = !bPwdSwitch;
-                if(bPwdSwitch) {
+                if (bPwdSwitch) {
                     ivPwdSwitch.setImageResource(
                             R.drawable.outline_visibility_24);
                     etPwd.setInputType(
@@ -58,7 +69,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             R.drawable.outline_visibility_off_24);
                     etPwd.setInputType(
                             InputType.TYPE_TEXT_VARIATION_PASSWORD |
-                            InputType.TYPE_CLASS_TEXT);
+                                    InputType.TYPE_CLASS_TEXT);
                     etPwd.setTypeface(Typeface.DEFAULT);
                 }
             }
@@ -69,7 +80,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .getString(R.string.shared_preferences_file_name);
         String accountKey = getResources()
                 .getString(R.string.login_account_name);
-        String passwordKey =  getResources()
+        String passwordKey = getResources()
                 .getString(R.string.login_password);
         String rememberPasswordKey = getResources()
                 .getString(R.string.login_remember_password);
@@ -112,7 +123,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             };
             String selection = dbHelper.getColumnUsername() + " = ? AND " +
                     dbHelper.getColumnPassword() + " = ?";
-            String[] selectionArgs = {username,  password};
+            String[] selectionArgs = {username, password};
 
             Cursor cursor = db.query(
                     dbHelper.getTableName(),
@@ -125,14 +136,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             if (cursor.moveToFirst()) {
                 //成功登录
-                Toast.makeText(getApplicationContext(),"Login successful.",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Login successful.", Toast.LENGTH_SHORT).show();
 
                 //储存登录信息到sharedPreferences中
                 String spFileName = getResources()
                         .getString(R.string.shared_preferences_file_name);
                 String accountKey = getResources()
                         .getString(R.string.login_account_name);
-                String passwordKey =  getResources()
+                String passwordKey = getResources()
                         .getString(R.string.login_password);
 
                 SharedPreferences spFile = getSharedPreferences(spFileName, Context.MODE_PRIVATE);
@@ -151,7 +162,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 //可以在这里导航到下一个活动或执行其他操作
             } else {
                 //登录失败
-                Toast.makeText(this, "登录失败",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "登录失败", Toast.LENGTH_SHORT).show();
             }
 
             cursor.close();
@@ -167,20 +178,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
             ContentValues values = new ContentValues();
-            values.put(dbHelper.getColumnUsername(),account);
-            values.put(dbHelper.getColumnPassword(),password);
+            values.put(dbHelper.getColumnUsername(), account);
+            values.put(dbHelper.getColumnPassword(), password);
 
-            long newRowId = db.insert(dbHelper.getTableName(),null,values);
+            long newRowId = db.insert(dbHelper.getTableName(), null, values);
 
 
-            if (newRowId != -1){
+            if (newRowId != -1) {
                 //表示成功将信息添加到数据库中
                 //如果插入成功，数据库会返回插入的行的ID（或者称为记录的ID），如果插入失败，通常会返回-1
-                Toast.makeText(getApplicationContext(),"Registration successful. Please log in.",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Registration successful. Please log in.", Toast.LENGTH_SHORT).show();
                 //清除输入框
                 etAccount.setText("");
                 etPwd.setText("");
-            }else {
+            } else {
                 //注册失败
             }
             db.close();
