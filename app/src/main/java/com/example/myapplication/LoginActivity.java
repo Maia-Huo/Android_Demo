@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputType;
@@ -25,24 +24,21 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
-
     private EditText etPwd;
     private Boolean bPwdSwitch = false;
     private EditText etAccount;
     private CheckBox cbRememberPwd;
 
+
+    protected void onStart() {
+        super.onStart();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login2);
-//获取权限
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.INTERNET},
-                    1);
-        }
-//
+
         final ImageView ivPwdSwitch = findViewById(R.id.iv_pwd_switch);
         etPwd = findViewById(R.id.et_pwd);
         etAccount = findViewById(R.id.et_account);

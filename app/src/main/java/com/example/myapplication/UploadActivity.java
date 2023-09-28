@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -41,7 +43,10 @@ public class UploadActivity extends AppCompatActivity {
                 // 示例代码：uploadFile(selectedFileUri);
             }
         });
+        // 创建 RequestPermission 实例
+        new PermissionManager(this);
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
