@@ -1,4 +1,5 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,8 +10,10 @@
         android:id="@+id/select_file_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="选择文件"
-        android:layout_centerInParent="true" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="185dp"
+        android:text="选择文件" />
 
     <TextView
         android:id="@+id/selected_file_name"
@@ -31,5 +34,48 @@
         android:layout_below="@id/selected_file_name"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="24dp" />
+
+    <!-- 底部按钮布局 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:gravity="center">
+
+        <!-- 第一个底部按钮 -->
+        <Button
+            android:id="@+id/navigation_home"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="主页"
+            android:background="@android:color/darker_gray"
+            android:textColor="@android:color/white"
+            android:gravity="center" />
+
+        <!-- 第二个底部按钮 -->
+        <Button
+            android:id="@+id/navigation_upload"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="上传"
+            android:background="@android:color/darker_gray"
+            android:textColor="@android:color/white"
+            android:gravity="center" />
+
+        <!-- 第三个底部按钮 -->
+        <Button
+            android:id="@+id/navigation_profile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="个人资料"
+            android:background="@android:color/darker_gray"
+            android:textColor="@android:color/white"
+            android:gravity="center" />
+
+    </LinearLayout>
 
 </RelativeLayout>

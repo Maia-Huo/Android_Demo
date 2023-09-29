@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
@@ -21,9 +22,35 @@ public class UploadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
 
+        Button home = findViewById(R.id.navigation_home);
+        Button upload = findViewById(R.id.navigation_upload);
+        Button profile = findViewById(R.id.navigation_profile);
+
         selectedFileName = findViewById(R.id.selected_file_name);
         Button selectFileButton = findViewById(R.id.select_file_button);
         Button uploadButton = findViewById(R.id.upload_button);
+
+        home.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //跳转到home
+                Intent intent = new Intent(UploadActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        upload.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast.makeText(UploadActivity.this, "Upload", Toast.LENGTH_SHORT).show();
+            }
+        });
+        profile.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //跳转到profile
+                Intent intent = new Intent(UploadActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         selectFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,6 +72,10 @@ public class UploadActivity extends AppCompatActivity {
         });
         // 创建 RequestPermission 实例
         new PermissionManager(this);
+
+
+
+
     }
 
 

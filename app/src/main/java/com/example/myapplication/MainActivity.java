@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -26,53 +27,82 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BottomNavigationView bottomNavigationView;
+    //private BottomNavigationView bottomNavigationView;
     private RecyclerView photoGallery;
     private GalleryAdapter galleryAdapter;
     private static final int PICK_IMAGE_REQUEST = 1;
     private List<PhotoItem> photoItemList; // 存储图片项数据列表
     private int selectedPhotoPosition = -1; // 用于跟踪用户选择的图片位置
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment selectedFragment = null;
+        Button home = findViewById(R.id.navigation_home);
+        Button upload = findViewById(R.id.navigation_upload);
+        Button profile = findViewById(R.id.navigation_profile);
 
-//                switch (item.getItemId()) {
-//                    case R.id.navigation_home:
-//                        selectedFragment = new HomeFragment();
-//                        break;
-//                    case R.id.navigation_upload:
-//                        selectedFragment = new UploadFragment();
-//                        break;
-//                    case R.id.navigation_profile:
-//                        selectedFragment = new ProfileFragment();
-//                        break;
-//                }
-
-                if (item.getItemId() == R.id.navigation_home) {
-                    selectedFragment = new HomeFragment();
-                } else if (item.getItemId() == R.id.navigation_upload) {
-                    selectedFragment = new UploadFragment();
-                } else if (item.getItemId() == R.id.navigation_profile) {
-                    selectedFragment = new ProfileFragment();
-                }
-
-
-                if (selectedFragment != null) {
-                    FragmentManager fragmentManager = getSupportFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
-                }
-
-                return true;
+        home.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Home", Toast.LENGTH_SHORT).show();
             }
         });
+        upload.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //跳转到uppload
+                Intent intent = new Intent(MainActivity.this, UploadActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        profile.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //跳转到profile
+                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+
+
+//        bottomNavigationView = findViewById(R.id.bottom_navigation);
+//        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//                Fragment selectedFragment = null;
+//
+////                switch (item.getItemId()) {
+////                    case R.id.navigation_home:
+////                        selectedFragment = new HomeFragment();
+////                        break;
+////                    case R.id.navigation_upload:
+////                        selectedFragment = new UploadFragment();
+////                        break;
+////                    case R.id.navigation_profile:
+////                        selectedFragment = new ProfileFragment();
+////                        break;
+////                }
+//
+//                if (item.getItemId() == R.id.navigation_home) {
+//                    selectedFragment = new HomeFragment();
+//                } else if (item.getItemId() == R.id.navigation_upload) {
+//                    selectedFragment = new UploadFragment();
+//                } else if (item.getItemId() == R.id.navigation_profile) {
+//                    selectedFragment = new ProfileFragment();
+//                }
+//
+//
+//                if (selectedFragment != null) {
+//                    FragmentManager fragmentManager = getSupportFragmentManager();
+//                    fragmentManager.beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+//                }
+//
+//                return true;
+//            }
+//        });
 
         // 默认选择主页
         //bottomNavigationView.setSelectedItemId(R.id.navigation_home);
