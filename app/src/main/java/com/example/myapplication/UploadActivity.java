@@ -1,27 +1,57 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import java.util.Arrays;
 
 public class UploadActivity extends AppCompatActivity {
 
-    private static final int PICK_FILE_REQUEST = 1;
     private TextView selectedFileName;
+    byte[] imageBytes;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upload);
+    // 创建 RequestPermission 实例
+    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    // Handle the returned Uri
+                    try {
+                        Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        imageBytes = stream.toByteArray();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
 
+
+    public void initview() {
         Button home = findViewById(R.id.navigation_home);
         Button upload = findViewById(R.id.navigation_upload);
         Button profile = findViewById(R.id.navigation_profile);
@@ -56,44 +86,33 @@ public class UploadActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 启动文件选择器
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*"); // 任何文件类型
-                startActivityForResult(intent, PICK_FILE_REQUEST);
+                // 创建并打开一个选择图片的Intent
+                mGetContent.launch("image/*");
             }
         });
 
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // 在此处执行上传文件的操作
-                // 获取选定文件的 URI，并执行上传逻辑
-                // 示例代码：uploadFile(selectedFileUri);
+                new Thread(new Runnable() {
+                    public void run() {
+                        DatabaseConnectAndDataProcess databaseConnectAndDataProcess = new DatabaseConnectAndDataProcess();
+                        Connection connection = databaseConnectAndDataProcess.Connect();
+                        boolean result = databaseConnectAndDataProcess.insert(connection,imageBytes);
+                    }
+                }).start();
             }
         });
         // 创建 RequestPermission 实例
-        new PermissionManager(this);
-
-
-
-
     }
-
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == PICK_FILE_REQUEST && resultCode == RESULT_OK && data != null) {
-            // 处理选定的文件
-            Uri selectedFileUri = data.getData();
-            String selectedFileName = getFileNameFromUri(selectedFileUri);
-
-            TextView selectedFileNameTextView = findViewById(R.id.selected_file_name);
-            // 更新 TextView 的文本
-            selectedFileNameTextView.setText("Selected File: " + selectedFileName);
-        }
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_upload);
+        new PermissionManager(this);
+        initview();
     }
-
 
     // 辅助方法：从 URI 获取文件名
     private String getFileNameFromUri(Uri uri) {

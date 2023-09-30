@@ -30,7 +30,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         final PhotoItem photoItem = photoList.get(position);
 
         // 设置图片和其他UI元素
-        holder.photoImageView.setImageURI(photoItem.getImageUri());
+        holder.photoImageView.setImageBitmap(photoItem.getImageBitmap());
+//        holder.photoImageView.setImageURI(photoItem.getImageUri());
         holder.authorTextView.setText(photoItem.getAuthor());
         holder.likesTextView.setText(String.valueOf(photoItem.getLikes()));
 

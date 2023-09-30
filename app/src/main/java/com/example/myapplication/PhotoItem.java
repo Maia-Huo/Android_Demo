@@ -1,28 +1,26 @@
 package com.example.myapplication;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PhotoItem {
-    private Uri imageResource;
+    private Bitmap imageBitmap;
     private String author;
     private int likes;
     private boolean liked;
     private List<String> comments;
 
-    public PhotoItem(Uri imageResource, String author, int likes) {
-        this.imageResource = imageResource;
+    public PhotoItem(Bitmap imageBitmap, String author, int likes) {
+        this.imageBitmap = imageBitmap;
         this.author = author;
         this.likes = likes;
         this.liked = false;
         this.comments = new ArrayList<>();
     }
 
-    public Uri getImageUri() {
-        return imageResource;
-    }
 
     public String getAuthor() {
         return author;
@@ -46,5 +44,9 @@ public class PhotoItem {
 
     public void addComment(String comment) {
         comments.add(comment);
+    }
+
+    public Bitmap getImageBitmap() {
+        return imageBitmap;
     }
 }
