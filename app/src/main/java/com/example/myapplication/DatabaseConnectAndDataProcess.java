@@ -22,6 +22,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import android.app.Application;
 
 public class DatabaseConnectAndDataProcess {
@@ -89,52 +90,32 @@ public class DatabaseConnectAndDataProcess {
     public boolean insert(Connection connection, byte[] imageBytes) {
         synchronized (lock) {
             int num = NumGet(connection);
-            int partSize = 1024; // 每个部分的大小
-            int partCount = (imageBytes.length + partSize - 1) / partSize; // 获取部分的数量
-            for (int i = 0; i < partCount; i++) {
-                int start = i * partSize;
-                int end = Math.min(start + partSize, imageBytes.length);
-                byte[] partBytes = Arrays.copyOfRange(imageBytes, start, end);
-                String sql = "INSERT INTO images(image,num,ImageOrder) VALUES (?,?,?)";
-                PreparedStatement statement = null;
-                try {
-                    statement = connection.prepareStatement(sql);
-                    statement.setBytes(1, partBytes);
-                    statement.setInt(2, num + 1);
-                    statement.setInt(3, i + 1);
-                    statement.executeUpdate();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+            String sql = "INSERT INTO images(image,num) VALUES (?,?)";
+            PreparedStatement statement = null;
+            try {
+                statement = connection.prepareStatement(sql);
+                statement.setBytes(1, imageBytes);
+                statement.setInt(2, num + 1);
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         }
         return true;
     }
 
-    public ArrayList<Bitmap> ImageGet(Connection connection,Context context) {
-        int[] nums = BitmapGet(connection);
-        ArrayList<Bitmap> bitmaps = new ArrayList<>();
-        for (int i = 0; i < nums.length; i++) {
-            Bitmap bitmap;
-            String sql = "SELECT image FROM images where num = ? order by ImageOrder ASC;";
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setLong(1, nums[i]);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    List<Blob> blobs = new ArrayList<>();
-                    while (resultSet.next()) {
-                        blobs.add(resultSet.getBlob("image"));
-                    }
-                    Log.d("blobs", String.valueOf(blobs.size()));
-                    bitmap = convertBlobsToBitmap(blobs,context);
-                    bitmaps.add(bitmap);
-                }
-            } catch (SQLException e) {
-                // Handle or log the exception as appropriate
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                // Handle or log the exception as appropriate
-                throw new RuntimeException(e);
-            }
+    public Bitmap[] ImageGet(Connection connection) throws SQLException {
+        Bitmap[] bitmaps = new Bitmap[Count(connection)];
+        String sql = "SELECT image FROM images;";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        ResultSet resultSet = statement.executeQuery();
+        int i = 0;
+        while (resultSet.next()) {
+            Blob blob = resultSet.getBlob("image");
+            InputStream inputStream = blob.getBinaryStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            bitmaps[i] = bitmap;
+            i++;
         }
         return bitmaps;
     }
@@ -198,7 +179,7 @@ public class DatabaseConnectAndDataProcess {
             options.inJustDecodeBounds = false;
             options.inSampleSize = 1; // 不进行缩放
             options.inPreferredConfig = Bitmap.Config.ARGB_8888; // 设置颜色格式
-   //         options.inMuteable = true; // 设置可变性，以便后续操作
+            //         options.inMuteable = true; // 设置可变性，以便后续操作
             if (bitmap == null) {
                 // 如果是第一个块，创建一个空的 Bitmap 对象
                 bitmap = Bitmap.createBitmap(width, chunkSize, Bitmap.Config.ARGB_8888);
