@@ -12,45 +12,4 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- 三个按钮占据整行 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <!-- 第一个按钮 -->
-        <Button
-            android:id="@+id/navigation_home"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="主页"
-            android:background="@android:color/darker_gray"
-            android:textColor="@android:color/white"
-            android:gravity="center" />
-
-        <!-- 第二个按钮 -->
-        <Button
-            android:id="@+id/navigation_upload"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="上传"
-            android:background="@android:color/darker_gray"
-            android:textColor="@android:color/white"
-            android:gravity="center" />
-
-        <!-- 第三个按钮 -->
-        <Button
-            android:id="@+id/navigation_profile"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="个人资料"
-            android:background="@android:color/darker_gray"
-            android:textColor="@android:color/white"
-            android:gravity="center" />
-
-    </LinearLayout>
-
 </LinearLayout>
