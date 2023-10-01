@@ -52,7 +52,7 @@ public class DatabaseConnectAndDataProcess {
 
     public int NumGet(Connection connection) {
         synchronized (lock) {
-            String sql = "SELECT MAX(DISTINCT num) FROM images;";
+            String sql = "SELECT MAX(num) FROM images;";
             Statement statement = null;
             try {
                 statement = connection.createStatement();
@@ -70,7 +70,7 @@ public class DatabaseConnectAndDataProcess {
 
     public int Count(Connection connection) {
         synchronized (lock) {
-            String sql = "SELECT COUNT(DISTINCT num) FROM images;";
+            String sql = "SELECT COUNT(num) FROM images;";
             Statement statement = null;
             try {
                 statement = connection.createStatement();
@@ -83,22 +83,59 @@ public class DatabaseConnectAndDataProcess {
                 throw new RuntimeException(e);
             }
         }
-
         return 0;
     }
 
     public boolean insert(Connection connection, byte[] imageBytes) {
-        synchronized (lock) {
+        synchronized (lock){
             int num = NumGet(connection);
-            String sql = "INSERT INTO images(image,num) VALUES (?,?)";
+            String sql = "SELECT * FROM images WHERE num = ?";
             PreparedStatement statement = null;
             try {
+                statement = connection.prepareStatement(sql);
+                statement.setInt(1, num + 1);
+                ResultSet resultSet = statement.executeQuery();
+                if (resultSet.next()) {
+                    return false;  // 数据已存在，不再插入
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            sql = "INSERT INTO images(image,num) VALUES (?,?)";
+            statement = null;
+            try {
+                // 开始事务
+                connection.setAutoCommit(false);
                 statement = connection.prepareStatement(sql);
                 statement.setBytes(1, imageBytes);
                 statement.setInt(2, num + 1);
                 statement.executeUpdate();
+
+                // 提交事务
+                connection.commit();
             } catch (SQLException e) {
+                // 回滚事务
+                try {
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
                 throw new RuntimeException(e);
+            } finally {
+                try {
+                    if (statement != null) {
+                        statement.close();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                // 释放连接
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return true;

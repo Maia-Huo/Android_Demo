@@ -20,6 +20,8 @@ import androidx.fragment.app.Fragment;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class UploadFragment extends Fragment {
     private byte[] imageBytes;
@@ -69,10 +71,17 @@ public class UploadFragment extends Fragment {
             public void onClick(View view) {
                 new Thread(new Runnable() {
                     public void run() {
-                        DatabaseConnectAndDataProcess databaseConnectAndDataProcess = new DatabaseConnectAndDataProcess();
-                        Connection connection = databaseConnectAndDataProcess.Connect();
-                        if (imageBytes != null && imageBytes.length > 0) {
-                            boolean result = databaseConnectAndDataProcess.insert(connection, imageBytes);
+                        Lock lock = new ReentrantLock();
+                        lock.lock();
+                        try {
+                            DatabaseConnectAndDataProcess databaseConnectAndDataProcess = new DatabaseConnectAndDataProcess();
+                            Connection connection = databaseConnectAndDataProcess.Connect();
+                            if (imageBytes != null && imageBytes.length > 0) {
+                                boolean result = databaseConnectAndDataProcess.insert(connection, imageBytes);
+                            }
+                            imageBytes = null;
+                        } finally {
+                            lock.unlock();
                         }
                     }
                 }).start();
