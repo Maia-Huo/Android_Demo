@@ -2,7 +2,9 @@ package com.example.myapplication;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,9 +26,12 @@ public class HomeFragment extends Fragment {
     private GalleryAdapter galleryAdapter;
     private List<PhotoItem> photoItemList = new ArrayList<>();
 
+    private boolean isUploadCompleted = false;
+
     private void loadPhotosFromDatabase() {
-        new Thread(new Runnable() {
-            public void run() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
                 DatabaseConnectAndDataProcess databaseConnectAndDataProcess = new DatabaseConnectAndDataProcess();
                 Connection connection = databaseConnectAndDataProcess.Connect();
                 int len = databaseConnectAndDataProcess.Count(connection);
@@ -34,7 +39,7 @@ public class HomeFragment extends Fragment {
                     Bitmap[] bitmaps = databaseConnectAndDataProcess.ImageGet(connection);
                     if (bitmaps.length > 0) {
                         for (int i = 0; i < len; i++) {
-                            Log.d("PhotoGalleryFragment", "run: " + bitmaps[i]);
+                            Log.d("PhotoGalleryFragment", "doInBackground: " + bitmaps[i]);
                             final PhotoItem photoItem = new PhotoItem(bitmaps[i], "Author 1", 10);
                             if (isAdded()) { // Check if Fragment is still added to Activity
                                 requireActivity().runOnUiThread(new Runnable() {
@@ -50,8 +55,21 @@ public class HomeFragment extends Fragment {
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
+                return null;
             }
-        }).start();
+        }.execute();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!isUploadCompleted) {
+                    // 数据还没有完全同步到数据库，不允许再次上传数据
+                    return;
+                }
+                // 数据已经完全同步到数据库，允许再次上传数据
+                loadPhotosFromDatabase();
+            }
+        }, 1000);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
