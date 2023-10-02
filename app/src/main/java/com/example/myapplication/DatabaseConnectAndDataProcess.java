@@ -39,7 +39,7 @@ public class DatabaseConnectAndDataProcess {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             connection = DriverManager.getConnection(url, user, password);
             // 连接到数据库成功，可以在这里执行SQL语句
-            Log.d("sql", connection.getCatalog());
+            Log.d("sql", "连接成功");
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -86,7 +86,7 @@ public class DatabaseConnectAndDataProcess {
         return 0;
     }
 
-    public boolean insert(Connection connection, byte[] imageBytes) {
+    public boolean insert(Connection connection, byte[] imageBytes,String comment) {
         synchronized (lock){
             int num = NumGet(connection);
             String sql = "SELECT * FROM images WHERE num = ?";
@@ -102,7 +102,7 @@ public class DatabaseConnectAndDataProcess {
                 throw new RuntimeException(e);
             }
 
-            sql = "INSERT INTO images(image,num) VALUES (?,?)";
+            sql = "INSERT INTO images(image,num,comment) VALUES (?,?,?)";
             statement = null;
             try {
                 // 开始事务
@@ -110,6 +110,7 @@ public class DatabaseConnectAndDataProcess {
                 statement = connection.prepareStatement(sql);
                 statement.setBytes(1, imageBytes);
                 statement.setInt(2, num + 1);
+                statement.setString(3,comment);
                 statement.executeUpdate();
 
                 // 提交事务
