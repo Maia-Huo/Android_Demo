@@ -29,15 +29,15 @@
 
         <Button
             android:id="@+id/button1"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="分享"
-            android:gravity="center"
-            android:layout_weight="1"/>
+            android:gravity="center" />
 
         <Button
             android:id="@+id/button2"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="主页"
             android:gravity="center"
@@ -45,7 +45,7 @@
 
         <Button
             android:id="@+id/button3"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="个人"
             android:gravity="center"

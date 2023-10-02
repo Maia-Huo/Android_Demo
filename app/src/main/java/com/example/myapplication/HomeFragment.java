@@ -36,20 +36,15 @@ public class HomeFragment extends Fragment {
                         for (int i = 0; i < len; i++) {
                             Log.d("PhotoGalleryFragment", "run: " + bitmaps[i]);
                             final PhotoItem photoItem = new PhotoItem(bitmaps[i], "Author 1", 10);
-                            requireActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (getActivity() != null) {
-                                        requireActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                photoItemList.add(photoItem);
-                                                galleryAdapter.notifyDataSetChanged();
-                                            }
-                                        });
+                            if (isAdded()) { // Check if Fragment is still added to Activity
+                                requireActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        photoItemList.add(photoItem);
+                                        galleryAdapter.notifyDataSetChanged();
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     }
                 } catch (SQLException e) {

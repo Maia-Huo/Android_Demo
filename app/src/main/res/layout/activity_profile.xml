@@ -1,15 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="10dp"
     android:orientation="vertical"
-    android:gravity="bottom">
+    android:padding="16dp"
+    tools:context=".ProfileActivity">
 
-    <!-- 占用剩余空间的视图 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- 用户头像 -->
+        <ImageView
+            android:id="@+id/profile_image"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:contentDescription="User Profile Image"
+            android:src="@drawable/img_01" />
+
+        <!-- 用户姓名布局 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <!-- 用户姓名 -->
+            <TextView
+                android:id="@+id/profile_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="嗨嗨嗨"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 分隔线 -->
     <View
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/purple" />
 
+    <!-- 属性1 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/shared_photos"
+            app:tint="@color/purple" />
+
+        <TextView
+            android:id="@+id/property1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="我的分享"
+            android:textSize="20sp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="15dp" />
+
+        <!-- 展开图标 -->
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/arrow_forward"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="20dp"
+            app:tint="@color/purple"/>
+    </LinearLayout>
+
+    <!-- 分隔线 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/purple"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"/>
+
+    <!-- 属性2 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/quit"
+            app:tint="@color/purple"/>
+
+        <TextView
+            android:id="@+id/property2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="退出登录"
+            android:textSize="20sp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="15dp" />
+
+        <!-- 展开图标 -->
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/arrow_forward"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="20dp"
+            app:tint="@color/purple"/>
+    </LinearLayout>
+
+    <!-- 添加更多属性（示例） -->
+
+    <!-- 分隔线 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/darker_gray" />
+
+    <!-- 更多属性 -->
 </LinearLayout>

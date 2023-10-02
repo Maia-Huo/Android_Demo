@@ -69,10 +69,12 @@ public class UploadFragment extends Fragment {
             public void onClick(View view) {
                 new Thread(new Runnable() {
                     public void run() {
-                        DatabaseConnectAndDataProcess databaseConnectAndDataProcess = new DatabaseConnectAndDataProcess();
-                        Connection connection = databaseConnectAndDataProcess.Connect();
-                        if (imageBytes != null && imageBytes.length > 0) {
-                            boolean result = databaseConnectAndDataProcess.insert(connection, imageBytes);
+                        synchronized (this) {
+                            DatabaseConnectAndDataProcess databaseConnectAndDataProcess = new DatabaseConnectAndDataProcess();
+                            Connection connection = databaseConnectAndDataProcess.Connect();
+                            if (imageBytes != null && imageBytes.length > 0) {
+                                boolean result = databaseConnectAndDataProcess.insert(connection, imageBytes);
+                            }
                         }
                     }
                 }).start();
