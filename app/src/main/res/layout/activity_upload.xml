@@ -20,7 +20,7 @@
 
         <!-- 文本输入框 -->
         <EditText
-            android:id="@+id/caption_edit_text"
+            android:id="@+id/comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="这一刻的想法..."
@@ -34,7 +34,7 @@
             android:id="@+id/image_preview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/caption_edit_text"
+            android:layout_below="@id/comment"
             android:layout_marginTop="16dp"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
