@@ -1,6 +1,8 @@
 package com.example.myapplication;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.ListFragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -36,6 +39,7 @@ public class UploadFragment extends Fragment {
 
     private DataShare dataShare;
 
+    private String username;
     private DatabaseConnectAndDataProcess databaseConnectAndDataProcess;
     private Connection connection;
 
@@ -45,6 +49,10 @@ public class UploadFragment extends Fragment {
         View view = inflater.inflate(R.layout.activity_upload, container, false);
         // 在这里添加获取ViewModel的逻辑
         dataShare = new ViewModelProvider(requireActivity()).get(DataShare.class);
+
+        //获取用户名
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("username", Context.MODE_PRIVATE);
+        username = sharedPreferences.getString("username", null);
 
         //绑定控件
         imagePreview = view.findViewById(R.id.image_preview);
@@ -120,17 +128,22 @@ public class UploadFragment extends Fragment {
                 // 更新 UI 或执行其他操作
             }
         });
+
+
+        //Log.d("username", username);
         String caption = captionEditText.getText().toString();
         if (TextUtils.isEmpty(caption) && imageBytes == null) {
             Toast.makeText(getActivity(), "请输入文字或选择图片", Toast.LENGTH_SHORT).show();
             return;
         }
         String comment = captionEditText.getText().toString();//获取输入的评论
+
+
         new Thread(new Runnable() {
             public void run() {
                 synchronized (this) {
                     if (imageBytes != null && imageBytes.length > 0) {
-                        databaseConnectAndDataProcess.insert(connection, imageBytes, comment);
+                        databaseConnectAndDataProcess.insert(connection, imageBytes, comment, username);
                     }
                 }
             }

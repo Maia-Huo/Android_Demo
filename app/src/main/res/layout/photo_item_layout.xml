@@ -20,6 +20,12 @@
         android:textSize="16sp"
         android:padding="8dp" />
 
+    <TextView
+        android:id="@+id/comment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

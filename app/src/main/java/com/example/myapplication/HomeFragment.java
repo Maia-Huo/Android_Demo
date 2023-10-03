@@ -34,6 +34,7 @@ public class HomeFragment extends Fragment {
 
     private DatabaseConnectAndDataProcess databaseConnectAndDataProcess;
     private Connection connection;
+    private String username;
     private DataShare dataShare;
     private boolean isUploadCompleted = false;
 
@@ -43,10 +44,12 @@ public class HomeFragment extends Fragment {
             int len = databaseConnectAndDataProcess.Count(connection);
             try {
                 Bitmap[] bitmaps = databaseConnectAndDataProcess.ImageGet(connection);
+                String[] usernames = databaseConnectAndDataProcess.UsernameGet();
+                String[] comments = databaseConnectAndDataProcess.CommentGet();
                 if (bitmaps.length > 0) {
                     for (int i = 0; i < len; i++) {
                         Log.d("PhotoGalleryFragment", "doInBackground: " + bitmaps[i]);
-                        final PhotoItem photoItem = new PhotoItem(bitmaps[i], "Author 1", 10);
+                        final PhotoItem photoItem = new PhotoItem(bitmaps[i], usernames[i], comments[i]);
                         if (isAdded()) { // Check if Fragment is still added to Activity
                             requireActivity().runOnUiThread(() -> {
                                 photoItemList.add(photoItem);

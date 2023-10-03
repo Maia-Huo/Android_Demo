@@ -91,6 +91,7 @@
 
     <!-- 属性2 -->
     <LinearLayout
+        android:id="@+id/quit_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -102,7 +103,7 @@
             app:tint="@color/purple"/>
 
         <TextView
-            android:id="@+id/property2"
+            android:id="@+id/quit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

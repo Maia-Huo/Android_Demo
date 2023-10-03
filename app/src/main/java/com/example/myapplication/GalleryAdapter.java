@@ -33,8 +33,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         holder.photoImageView.setImageBitmap(photoItem.getImageBitmap());
 //        holder.photoImageView.setImageURI(photoItem.getImageUri());
         holder.authorTextView.setText(photoItem.getAuthor());
-        holder.likesTextView.setText(String.valueOf(photoItem.getLikes()));
-
+//        holder.likesTextView.setText(String.valueOf(photoItem.getLikes()));
+        holder.comment.setText(photoItem.getComment());
         // 设置点赞按钮的状态
         if (photoItem.isLiked()) {
             holder.likeButton.setText("取消点赞");
@@ -85,6 +85,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView photoImageView;
         public TextView authorTextView;
+        public TextView comment;
         public TextView likesTextView;
         public Button likeButton;
         public Button commentButton;
@@ -95,6 +96,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             super(view);
             photoImageView = view.findViewById(R.id.photo_image);
             authorTextView = view.findViewById(R.id.author_text);
+            comment = view.findViewById(R.id.comment);
             likesTextView = view.findViewById(R.id.likes_count);
             likeButton = view.findViewById(R.id.like_button);
             commentButton = view.findViewById(R.id.comment_button);

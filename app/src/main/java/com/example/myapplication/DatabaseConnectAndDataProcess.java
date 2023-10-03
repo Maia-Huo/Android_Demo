@@ -31,6 +31,8 @@ public class DatabaseConnectAndDataProcess {
     final String user = "lly3323w";
     final String password = "Aa123456789";
     int count;
+    String[] username;
+    String[] comment;
     private final Object lock = new Object();
 
     public Connection Connect() {
@@ -86,8 +88,8 @@ public class DatabaseConnectAndDataProcess {
         return 0;
     }
 
-    public boolean insert(Connection connection, byte[] imageBytes,String comment) {
-        synchronized (lock){
+    public boolean insert(Connection connection, byte[] imageBytes, String comment, String username) {
+        synchronized (lock) {
             int num = NumGet(connection);
             String sql = "SELECT * FROM images WHERE num = ?";
             PreparedStatement statement = null;
@@ -102,7 +104,7 @@ public class DatabaseConnectAndDataProcess {
                 throw new RuntimeException(e);
             }
 
-            sql = "INSERT INTO images(image,num,comment) VALUES (?,?,?)";
+            sql = "INSERT INTO images(image,num,comment,username) VALUES (?,?,?,?)";
             statement = null;
             try {
                 // 开始事务
@@ -110,7 +112,8 @@ public class DatabaseConnectAndDataProcess {
                 statement = connection.prepareStatement(sql);
                 statement.setBytes(1, imageBytes);
                 statement.setInt(2, num + 1);
-                statement.setString(3,comment);
+                statement.setString(3, comment);
+                statement.setString(4, username);
                 statement.executeUpdate();
 
                 // 提交事务
@@ -144,18 +147,46 @@ public class DatabaseConnectAndDataProcess {
 
     public Bitmap[] ImageGet(Connection connection) throws SQLException {
         Bitmap[] bitmaps = new Bitmap[Count(connection)];
-        String sql = "SELECT image FROM images;";
+        String[] username = new String[Count(connection)];
+        String[] comment = new String[Count(connection)];
+        String sql = "SELECT image,username,comment FROM images;";
         PreparedStatement statement = connection.prepareStatement(sql);
         ResultSet resultSet = statement.executeQuery();
         int i = 0;
         while (resultSet.next()) {
+            //获取图片
             Blob blob = resultSet.getBlob("image");
             InputStream inputStream = blob.getBinaryStream();
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
             bitmaps[i] = bitmap;
+
+            //获取作者
+            username[i] = resultSet.getString("username");
+
+            //获取评论
+            comment[i] = resultSet.getString("comment");
+
             i++;
         }
+        this.UsernameSet(username);
+        this.CommentSet(comment);
         return bitmaps;
+    }
+
+    public String[] CommentGet() {
+        return comment;
+    }
+
+    public String[] UsernameGet() {
+        return username;
+    }
+
+    public void UsernameSet(String[] username) {
+        this.username = username;
+    }
+
+    public void CommentSet(String[] comment) {
+        this.comment = comment;
     }
 
     public int[] BitmapGet(Connection connection) {
