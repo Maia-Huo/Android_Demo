@@ -43,6 +43,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login2);
 
 
+
         final ImageView ivPwdSwitch = findViewById(R.id.iv_pwd_switch);
         etPwd = findViewById(R.id.et_pwd);
         etAccount = findViewById(R.id.et_account);
@@ -103,6 +104,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             etPwd.setText(password);
         }
         cbRememberPwd.setChecked(rememberPassword);
+
+
+
     }
 
 
@@ -151,11 +155,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 SharedPreferences spFile = getSharedPreferences(spFileName, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = spFile.edit();
 
+
+
                 if (cbRememberPwd.isChecked()) {
+                    editor.putBoolean("isUserLoggedIn", true);
                     editor.putString(accountKey, username);
                     editor.putString(passwordKey, password);
                     editor.apply();
                 } else {
+                    editor.putBoolean("isUserLoggedIn", true);
                     editor.remove(accountKey);
                     editor.remove(passwordKey);
                     editor.apply();

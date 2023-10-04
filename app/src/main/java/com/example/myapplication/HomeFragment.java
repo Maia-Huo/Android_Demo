@@ -81,6 +81,8 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_main, container, false);
+
+
         // 在这里添加获取ViewModel的逻辑
         dataShare = new ViewModelProvider(requireActivity()).get(DataShare.class);
         // 观察 ViewModel 中的数据变化

@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
@@ -41,6 +45,37 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         } else {
             holder.likeButton.setText("点赞");
         }
+
+
+        // 设置点击事件
+        holder.photoImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 获取当前点击项的 PhotoItem
+                PhotoItem photoItem = photoList.get(holder.getAdapterPosition());
+
+                // 创建一个Intent来启动新的活动（图片详情页面）
+                Intent intent = new Intent(v.getContext(), DisplayImage.class);
+
+                // 将位图压缩为字节数组
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                photoItem.getImageBitmap().compress(Bitmap.CompressFormat.JPEG, 50, stream);
+                byte[] byteArray = stream.toByteArray();
+
+                // 将所选图像项的数据传递给新的活动
+                //intent.putExtra("imageBitmap", photoItem.getImageBitmap());
+
+                intent.putExtra("imageByteArray", byteArray);
+
+                intent.putExtra("author", photoItem.getAuthor());
+                intent.putExtra("comment", photoItem.getComment());
+
+                // 启动新的活动
+                v.getContext().startActivity(intent);
+            }
+        });
+
+
 
         // 设置点赞和评论按钮的点击事件
         holder.likeButton.setOnClickListener(new View.OnClickListener() {
