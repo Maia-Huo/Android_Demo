@@ -25,6 +25,8 @@ import java.util.List;
 
 import android.app.Application;
 
+import io.reactivex.internal.operators.completable.CompletableTakeUntilCompletable;
+
 public class DatabaseConnectAndDataProcess {
     //数据库
     final String url = "jdbc:mysql://rm-cn-lbj3es94l000h7jo.rwlb.rds.aliyuncs.com:3306/picture?autoReconnect=true&useSSL=false";
@@ -145,7 +147,8 @@ public class DatabaseConnectAndDataProcess {
         return true;
     }
 
-    public Bitmap[] ImageGet(Connection connection) throws SQLException {
+    public Bitmap[] ImageGet(Connection connection) throws SQLException, IOException {
+
         Bitmap[] bitmaps = new Bitmap[Count(connection)];
         String[] username = new String[Count(connection)];
         String[] comment = new String[Count(connection)];
@@ -158,6 +161,7 @@ public class DatabaseConnectAndDataProcess {
             Blob blob = resultSet.getBlob("image");
             InputStream inputStream = blob.getBinaryStream();
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
             bitmaps[i] = bitmap;
 
             //获取作者
@@ -189,24 +193,5 @@ public class DatabaseConnectAndDataProcess {
         this.comment = comment;
     }
 
-    public int[] BitmapGet(Connection connection) {
-        int[] nums = new int[Count(connection)];
-        synchronized (lock) {
-            String sql = "SELECT DISTINCT num FROM images;";
-            Statement statement = null;
-            try {
-                statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(sql);
-                int i = 0;
-                while (resultSet.next()) {
-                    nums[i] = resultSet.getInt("num");
-                    i++;
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return nums;
-    }
 
 }

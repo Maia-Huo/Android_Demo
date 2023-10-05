@@ -115,16 +115,15 @@ public class UploadFragment extends Fragment {
             public void onChanged(DatabaseConnectAndDataProcess databaseConnectAndDataProcess1) {
                 // 更新全局变量的值
                 databaseConnectAndDataProcess = databaseConnectAndDataProcess1;
-                Log.d("sql", "授予成功");
                 // 更新 UI 或执行其他操作
             }
         });
+
         dataShare.getConnection().observe(requireActivity(), new Observer<Connection>() {
             @Override
             public void onChanged(Connection connection1) {
                 // 更新全局变量的值
                 connection = connection1;
-                Log.d("sql", "授予成功");
                 // 更新 UI 或执行其他操作
             }
         });

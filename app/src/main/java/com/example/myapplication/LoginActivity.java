@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login2);
 
-
+        new PermissionManager(this);
 
         final ImageView ivPwdSwitch = findViewById(R.id.iv_pwd_switch);
         etPwd = findViewById(R.id.et_pwd);
@@ -104,7 +104,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             etPwd.setText(password);
         }
         cbRememberPwd.setChecked(rememberPassword);
-
 
 
     }
