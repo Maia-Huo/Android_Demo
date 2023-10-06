@@ -1,15 +1,9 @@
 package com.example.myapplication;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
@@ -19,13 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import android.app.Application;
-
-import io.reactivex.internal.operators.completable.CompletableTakeUntilCompletable;
 
 public class DatabaseConnectAndDataProcess {
     //数据库
@@ -35,6 +23,9 @@ public class DatabaseConnectAndDataProcess {
     int count;
     String[] username;
     String[] comment;
+
+    int[] likes;
+    int[] num;
     private final Object lock = new Object();
 
     public Connection Connect() {
@@ -90,7 +81,7 @@ public class DatabaseConnectAndDataProcess {
         return 0;
     }
 
-    public boolean insert(Connection connection, byte[] imageBytes, String comment, String username) {
+    public boolean insert(Connection connection, byte[] imageBytes, String comment, String username, int likes) {
         synchronized (lock) {
             int num = NumGet(connection);
             String sql = "SELECT * FROM images WHERE num = ?";
@@ -106,7 +97,7 @@ public class DatabaseConnectAndDataProcess {
                 throw new RuntimeException(e);
             }
 
-            sql = "INSERT INTO images(image,num,comment,username) VALUES (?,?,?,?)";
+            sql = "INSERT INTO images(image,num,comment,username,likes) VALUES (?,?,?,?,?)";
             statement = null;
             try {
                 // 开始事务
@@ -116,6 +107,7 @@ public class DatabaseConnectAndDataProcess {
                 statement.setInt(2, num + 1);
                 statement.setString(3, comment);
                 statement.setString(4, username);
+                statement.setInt(5, likes);
                 statement.executeUpdate();
 
                 // 提交事务
@@ -147,12 +139,57 @@ public class DatabaseConnectAndDataProcess {
         return true;
     }
 
+
+    public boolean updateLikes(Connection connection, int num, int newLikes) {
+        synchronized (lock) {
+            String sql = "UPDATE images SET likes = ? WHERE num = ?";
+            PreparedStatement statement = null;
+            try {
+                // 开始事务
+                connection.setAutoCommit(false);
+                statement = connection.prepareStatement(sql);
+                statement.setInt(1, newLikes);
+                statement.setInt(2, num);
+                statement.executeUpdate();
+
+                // 提交事务
+                connection.commit();
+                return true;
+            } catch (SQLException e) {
+                // 回滚事务
+                try {
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    if (statement != null) {
+                        statement.close();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                // 释放连接
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
     public Bitmap[] ImageGet(Connection connection) throws SQLException, IOException {
 
         Bitmap[] bitmaps = new Bitmap[Count(connection)];
         String[] username = new String[Count(connection)];
         String[] comment = new String[Count(connection)];
-        String sql = "SELECT image,username,comment FROM images;";
+        int[] likes = new int[Count(connection)];
+        int[] num = new int[Count(connection)];
+        String sql = "SELECT image,username,comment,likes,num FROM images;";
         PreparedStatement statement = connection.prepareStatement(sql);
         ResultSet resultSet = statement.executeQuery();
         int i = 0;
@@ -170,19 +207,33 @@ public class DatabaseConnectAndDataProcess {
             //获取评论
             comment[i] = resultSet.getString("comment");
 
+            //获取点赞数
+            likes[i] = resultSet.getInt("likes");
+
+            //
+            num[i] = resultSet.getInt("num");
+
             i++;
         }
+        this.num = num;
         this.UsernameSet(username);
         this.CommentSet(comment);
+        this.LikesSet(likes);
         return bitmaps;
     }
-
+    public int[] NumGet() {
+        return num;
+    }
     public String[] CommentGet() {
         return comment;
     }
 
     public String[] UsernameGet() {
         return username;
+    }
+
+    public int[] LikesGet() {
+        return likes;
     }
 
     public void UsernameSet(String[] username) {
@@ -193,5 +244,7 @@ public class DatabaseConnectAndDataProcess {
         this.comment = comment;
     }
 
-
+    public void LikesSet(int[] likes) {
+        this.likes = likes;
+    }
 }

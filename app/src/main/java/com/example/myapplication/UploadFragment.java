@@ -104,7 +104,7 @@ public class UploadFragment extends Fragment {
 
     private byte[] getBytesFromBitmap(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 1, stream);
         return stream.toByteArray();
     }
 
@@ -142,7 +142,8 @@ public class UploadFragment extends Fragment {
             public void run() {
                 synchronized (this) {
                     if (imageBytes != null && imageBytes.length > 0) {
-                        databaseConnectAndDataProcess.insert(connection, imageBytes, comment, username);
+                        databaseConnectAndDataProcess.insert(connection, imageBytes, comment, username, 0);
+                        dataShare.ReGet();
                     }
                 }
             }

@@ -1,6 +1,8 @@
 package com.example.myapplication;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,8 +29,7 @@ public class HomeFragment extends Fragment {
     private GalleryAdapter galleryAdapter;
     private List<PhotoItem> photoItemList = new ArrayList<>();
     private DataShare dataShare;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private TextView textView;
+
 
     @SuppressLint("MissingInflatedId")
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,6 +59,7 @@ public class HomeFragment extends Fragment {
                 galleryAdapter.notifyDataSetChanged(); // 通知适配器刷新数据
             }
         });
+
 
         return view;
     }

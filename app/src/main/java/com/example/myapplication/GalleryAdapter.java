@@ -1,7 +1,9 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,10 +11,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.ByteArrayOutputStream;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
 
@@ -33,18 +42,22 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         final PhotoItem photoItem = photoList.get(position);
 
-        // 设置图片和其他UI元素
-        holder.photoImageView.setImageBitmap(photoItem.getImageBitmap());
-//        holder.photoImageView.setImageURI(photoItem.getImageUri());
-        holder.authorTextView.setText(photoItem.getAuthor());
-//        holder.likesTextView.setText(String.valueOf(photoItem.getLikes()));
-        holder.comment.setText(photoItem.getComment());
+        //int likes = photoItem.getLikes();
         // 设置点赞按钮的状态
         if (photoItem.isLiked()) {
             holder.likeButton.setText("取消点赞");
+            //likes += 1;
         } else {
             holder.likeButton.setText("点赞");
         }
+
+        // 设置图片和其他UI元素
+        holder.photoImageView.setImageBitmap(photoItem.getImageBitmap());
+//        holder.photoImageView.setImageURI(photoItem.getImageUri());
+        holder.authorTextView.setText("作者：" + photoItem.getAuthor());
+        //holder.likesTextView.setText(String.valueOf(likes));
+        holder.likesTextView.setText(String.valueOf(photoItem.getLikes()));
+        holder.comment.setText(photoItem.getComment());
 
 
         // 设置点击事件
@@ -76,14 +89,35 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         });
 
 
-
         // 设置点赞和评论按钮的点击事件
         holder.likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 处理点赞操作
                 photoItem.setLiked(!photoItem.isLiked());
-                notifyDataSetChanged(); // 刷新适配器以更新UI
+
+                int newLikes = photoItem.isLiked() ? photoItem.getLikes() + 1 : photoItem.getLikes() - 1;
+
+                //updateLikes(photoItem, newLikes); // 更新点赞数
+                photoItem.setLikes(newLikes);
+                notifyDataSetChanged(); // 刷新适配器以更新UI);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DatabaseConnectAndDataProcess databaseConnectAndDataProcess = new DatabaseConnectAndDataProcess();
+                        Connection connection = databaseConnectAndDataProcess.Connect();
+
+                        databaseConnectAndDataProcess.updateLikes(connection, photoItem.getId(), newLikes);
+                        try {
+                            connection.close();
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }).start();
+                SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("likes", 0);
+                sharedPreferences.edit().putInt("likes", newLikes).apply();
+                sharedPreferences.edit().putInt("num", photoItem.getId()).apply();
             }
         });
 
@@ -116,6 +150,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     public int getItemCount() {
         return photoList.size();
     }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView photoImageView;
