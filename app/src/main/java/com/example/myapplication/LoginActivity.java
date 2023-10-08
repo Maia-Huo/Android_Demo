@@ -56,23 +56,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btRegister.setOnClickListener(this);
 
         //密码明文密文以及图标切换
-        ivPwdSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                bPwdSwitch = !bPwdSwitch;
-                if (bPwdSwitch) {
-                    ivPwdSwitch.setImageResource(
-                            R.drawable.outline_visibility_24);
-                    etPwd.setInputType(
-                            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                } else {
-                    ivPwdSwitch.setImageResource(
-                            R.drawable.outline_visibility_off_24);
-                    etPwd.setInputType(
-                            InputType.TYPE_TEXT_VARIATION_PASSWORD |
-                                    InputType.TYPE_CLASS_TEXT);
-                    etPwd.setTypeface(Typeface.DEFAULT);
-                }
+        ivPwdSwitch.setOnClickListener(view -> {
+            bPwdSwitch = !bPwdSwitch;
+            if (bPwdSwitch) {
+                ivPwdSwitch.setImageResource(
+                        R.drawable.outline_visibility_24);
+                etPwd.setInputType(
+                        InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            } else {
+                ivPwdSwitch.setImageResource(
+                        R.drawable.outline_visibility_off_24);
+                etPwd.setInputType(
+                        InputType.TYPE_TEXT_VARIATION_PASSWORD |
+                                InputType.TYPE_CLASS_TEXT);
+                etPwd.setTypeface(Typeface.DEFAULT);
             }
         });
 

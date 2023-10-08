@@ -5,16 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity_">
 
-<!--    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
-<!--        android:id="@+id/swipe_refresh_layout"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:layout_above="@+id/bottom_nav_bar">-->
 
-<!--        &lt;!&ndash; 在 SwipeRefreshLayout 中添加你的 Fragment 内容布局 &ndash;&gt;-->
-
-
-<!--    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"

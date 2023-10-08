@@ -4,9 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,13 +23,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainActivity_ extends AppCompatActivity implements View.OnClickListener {
-    private DataShare dataShare;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private TextView textView;
+    public static android.content.Context Context;
+    public static DataShare dataShare;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
-
+        Context = this;
         // 绑定控件
         Button button1 = findViewById(R.id.button1);
         Button button2 = findViewById(R.id.button2);
@@ -37,23 +38,13 @@ public class MainActivity_ extends AppCompatActivity implements View.OnClickList
         button2.setOnClickListener(this);
         button3.setOnClickListener(this);
 
-//        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
-//        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            public void onRefresh() {
-//                // 开始刷新
-//                dataShare.NewData();
-//                replaceFragment(new HomeFragment());
-//                // 通知刷新结束
-//                swipeRefreshLayout.setRefreshing(false);
-//            }
-//        });
         replaceFragment(new HomeFragment()); // Move this line here.
 
+        dataShare = new ViewModelProvider(this).get(DataShare.class);
+        dataShare.SetContext(this);
+
     }
 
-    public DataShare getDataShare() {
-        return dataShare;
-    }
 
     @Override
     public void onClick(View v) {
@@ -72,4 +63,5 @@ public class MainActivity_ extends AppCompatActivity implements View.OnClickList
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.commit();
     }
+
 }

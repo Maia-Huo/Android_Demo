@@ -2,7 +2,7 @@ package com.example.myapplication;
 //ViewModel作用是将UI控制器与数据分离，使得UI控制器不需要关心数据的获取和处理，只需要关心数据的展示。
 
 import android.content.Context;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,12 +15,17 @@ import androidx.lifecycle.ViewModel;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class DataShare extends ViewModel {
     private MutableLiveData<DatabaseConnectAndDataProcess> databaseConnectAndDataProcessLiveData;
     private MutableLiveData<Connection> connectionMutableLiveData = new MutableLiveData<>();
+    private Context context;
+
+    public void SetContext(Context context) {
+        this.context = context;
+    }
 
     public LiveData<Connection> getConnection() {
         return connectionMutableLiveData;
@@ -33,9 +38,9 @@ public class DataShare extends ViewModel {
     private MutableLiveData<List<PhotoItem>> photoItemListLiveData;
     private DatabaseConnectAndDataProcess databaseConnectAndDataProcess;
     private Connection connection;
-    private Bitmap[] bitmaps;
 
     public DataShare() {
+
         databaseConnectAndDataProcessLiveData = new MutableLiveData<>();
         photoItemListLiveData = new MutableLiveData<>();
         Thread thread = new Thread() {
@@ -47,6 +52,7 @@ public class DataShare extends ViewModel {
                 setDatabaseConnectAndDataProcess(databaseConnectAndDataProcess);
                 setConnection(connection);
                 setPhotoItemList(databaseConnectAndDataProcess);
+                NewPersonData();
             }
         };
         thread.start();
@@ -70,35 +76,43 @@ public class DataShare extends ViewModel {
         thread.start();
     }
 
+    private MutableLiveData<List<Bitmap>> bitmapsLiveData = new MutableLiveData<>();
+
+    public void NewPersonData() {
+        //读取SharedPreferences中保存的账号
+        SharedPreferences sharedPreferences = MainActivity_.Context.getSharedPreferences("username", Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("username", null);
+        final Handler handler = new Handler(Looper.getMainLooper());
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    List<Bitmap> bitmaps = databaseConnectAndDataProcess.PersonImageGet(connection, context, username);
+                    handler.post(() -> {
+                        bitmapsLiveData.postValue(bitmaps);
+                    });
+                } catch (SQLException | IOException | InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.start();
+    }
+
+    public MutableLiveData<List<Bitmap>> getBitmaps() {
+        return bitmapsLiveData;
+    }
+
     public void setPhotoItemList(DatabaseConnectAndDataProcess databaseConnectAndDataProcess) {
         final Handler handler = new Handler(Looper.getMainLooper());
         try {
-            bitmaps = databaseConnectAndDataProcess.ImageGet(connection);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        String[] usernames = databaseConnectAndDataProcess.UsernameGet();
-        String[] comments = databaseConnectAndDataProcess.CommentGet();
-        int[] likes = databaseConnectAndDataProcess.LikesGet();
-        int[] num = databaseConnectAndDataProcess.NumGet();
-
-
-        if (bitmaps.length > 0) {
+            List<PhotoItem> photoItems = databaseConnectAndDataProcess.ImageGet(connection, context);
             handler.post(() -> {
-                List<PhotoItem> photoItems = new ArrayList<>();
-                for (int i = bitmaps.length - 1; i >= 0; i--) {
-                    final PhotoItem photoItem = new PhotoItem(bitmaps[i], usernames[i], comments[i], likes[i], num[i]);
-                    photoItems.add(photoItem);
-                }
                 photoItemListLiveData.postValue(photoItems);
             });
+        } catch (SQLException | IOException | InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    public Bitmap getBitmap() {
-        return bitmaps[0];
     }
 
     public MutableLiveData<List<PhotoItem>> getPhotoItemList() {

@@ -3,7 +3,6 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +11,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
 
@@ -58,8 +53,16 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         //holder.likesTextView.setText(String.valueOf(likes));
         holder.likesTextView.setText(String.valueOf(photoItem.getLikes()));
         holder.comment.setText(photoItem.getComment());
-
-
+        holder.download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(new Runnable() {
+                    public void run() {
+                        SaveUtils.saveBitmapToAlbum(MainActivity_.Context, photoItem.getImageBitmap());
+                    }
+                }).start();
+            }
+        });
         // 设置点击事件
         holder.photoImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,6 +164,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         public Button commentButton;
         public TextView commentsTextView;
         public EditText commentEditText;
+        public Button download;
 
         public ViewHolder(View view) {
             super(view);
@@ -172,6 +176,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             commentButton = view.findViewById(R.id.comment_button);
             commentsTextView = view.findViewById(R.id.comments_text);
             commentEditText = view.findViewById(R.id.comment_edit_text);
+            download = view.findViewById(R.id.download);
         }
     }
 }

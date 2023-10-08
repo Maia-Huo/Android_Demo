@@ -143,7 +143,6 @@ public class UploadFragment extends Fragment {
                 synchronized (this) {
                     if (imageBytes != null && imageBytes.length > 0) {
                         databaseConnectAndDataProcess.insert(connection, imageBytes, comment, username, 0);
-                        dataShare.ReGet();
                     }
                 }
             }

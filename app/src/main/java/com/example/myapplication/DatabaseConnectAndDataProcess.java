@@ -1,8 +1,11 @@
 package com.example.myapplication;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+
+import com.bumptech.glide.Glide;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +16,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public class DatabaseConnectAndDataProcess {
@@ -182,48 +188,67 @@ public class DatabaseConnectAndDataProcess {
     }
 
 
-    public Bitmap[] ImageGet(Connection connection) throws SQLException, IOException {
-
-        Bitmap[] bitmaps = new Bitmap[Count(connection)];
-        String[] username = new String[Count(connection)];
-        String[] comment = new String[Count(connection)];
-        int[] likes = new int[Count(connection)];
-        int[] num = new int[Count(connection)];
-        String sql = "SELECT image,username,comment,likes,num FROM images;";
+    public List<PhotoItem> ImageGet(Connection connection, Context context) throws SQLException, IOException, ExecutionException, InterruptedException {
+        List<PhotoItem> photoItems = new ArrayList<>();
+        String sql = "SELECT image, username, comment,likes,num FROM images;";
         PreparedStatement statement = connection.prepareStatement(sql);
         ResultSet resultSet = statement.executeQuery();
-        int i = 0;
         while (resultSet.next()) {
-            //获取图片
+            // 获取图片
             Blob blob = resultSet.getBlob("image");
-            InputStream inputStream = blob.getBinaryStream();
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-
-            bitmaps[i] = bitmap;
-
-            //获取作者
-            username[i] = resultSet.getString("username");
-
-            //获取评论
-            comment[i] = resultSet.getString("comment");
-
-            //获取点赞数
-            likes[i] = resultSet.getInt("likes");
-
-            //
-            num[i] = resultSet.getInt("num");
-
-            i++;
+            if (blob != null) {
+                byte[] bytes = blob.getBytes(1, (int) blob.length());
+                if (bytes != null) {
+                    // 使用Glide加载Bitmap
+                    Bitmap bitmap = blobToBitmap(context, blob);
+                    String username = resultSet.getString("username");
+                    String comment = resultSet.getString("comment");
+                    int likes = resultSet.getInt("likes");
+                    int num = resultSet.getInt("num");
+                    PhotoItem photoItem = new PhotoItem(bitmap, username, comment, likes, num);
+                    photoItems.add(photoItem);
+                }
+            }
         }
-        this.num = num;
-        this.UsernameSet(username);
-        this.CommentSet(comment);
-        this.LikesSet(likes);
+        return photoItems;
+    }
+
+    public Bitmap blobToBitmap(Context context, Blob blob) throws IOException, InterruptedException, ExecutionException, SQLException {
+        if (blob != null) {
+            byte[] bytes = blob.getBytes(1, (int) blob.length());
+            if (bytes != null) {
+                return Glide.with(context)
+                        .asBitmap()
+                        .load(bytes)
+                        .submit()
+                        .get();
+            }
+        }
+        return null;
+    }
+
+    public List<Bitmap> PersonImageGet(Connection connection, Context context, String username) throws SQLException, IOException, ExecutionException, InterruptedException {
+        List<Bitmap> bitmaps = new ArrayList<>();
+        String sql = "SELECT image FROM images where username = " + username + ";";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            // 获取图片
+            Blob blob = resultSet.getBlob("image");
+            if (blob != null) {
+                Bitmap bitmap = blobToBitmap(context, blob);
+                if (bitmap != null) {
+                    bitmaps.add(bitmap);
+                }
+            }
+        }
         return bitmaps;
     }
+
     public int[] NumGet() {
         return num;
     }
+
     public String[] CommentGet() {
         return comment;
     }
