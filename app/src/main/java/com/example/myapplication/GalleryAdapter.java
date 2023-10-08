@@ -130,23 +130,23 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         for (String comment : comments) {
             commentsText.append(comment).append("\n");
         }
-        holder.commentsTextView.setText(commentsText.toString());
+        //holder.commentsTextView.setText(commentsText.toString());
 
         // 设置评论按钮的点击事件
-        holder.commentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 处理评论操作
-                String commentText = holder.commentEditText.getText().toString().trim();
-
-                // 如果评论文本不为空，将评论添加到 PhotoItem 对象中
-                if (!commentText.isEmpty()) {
-                    photoItem.addComment(commentText);
-                    notifyDataSetChanged(); // 刷新适配器以更新UI
-                    holder.commentEditText.setText(""); // 清空评论输入框
-                }
-            }
-        });
+//        holder.commentButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // 处理评论操作
+//                String commentText = holder.commentEditText.getText().toString().trim();
+//
+//                // 如果评论文本不为空，将评论添加到 PhotoItem 对象中
+//                if (!commentText.isEmpty()) {
+//                    photoItem.addComment(commentText);
+//                    notifyDataSetChanged(); // 刷新适配器以更新UI
+//                    holder.commentEditText.setText(""); // 清空评论输入框
+//                }
+//            }
+//        });
     }
 
     @Override
@@ -173,9 +173,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             comment = view.findViewById(R.id.comment);
             likesTextView = view.findViewById(R.id.likes_count);
             likeButton = view.findViewById(R.id.like_button);
-            commentButton = view.findViewById(R.id.comment_button);
-            commentsTextView = view.findViewById(R.id.comments_text);
-            commentEditText = view.findViewById(R.id.comment_edit_text);
+            //commentButton = view.findViewById(R.id.comment_button);
+            //commentsTextView = view.findViewById(R.id.comments_text);
+            //commentEditText = view.findViewById(R.id.comment_edit_text);
             download = view.findViewById(R.id.download);
         }
     }

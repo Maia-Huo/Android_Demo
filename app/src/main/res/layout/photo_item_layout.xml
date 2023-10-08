@@ -36,11 +36,6 @@
             android:layout_height="wrap_content"
             android:text="Like" />
 
-        <Button
-            android:id="@+id/comment_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Comment" />
 
         <TextView
             android:id="@+id/likes_count"
@@ -50,28 +45,18 @@
             android:text="10"
             android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/comments_text"
+
+
+
+        <Button
+            android:id="@+id/download"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Comments:"
-            android:textColor="@android:color/black"
-            android:textSize="16sp" />
-
-        <EditText
-            android:id="@+id/comment_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="添加评论..."
-            android:inputType="text"
-            android:maxLines="1" />
+            android:layout_marginLeft="50dp"
+            android:text="下载" />
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/download"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="download"/>
+
 
 </LinearLayout>

@@ -83,7 +83,7 @@ public class DataShare extends ViewModel {
         SharedPreferences sharedPreferences = MainActivity_.Context.getSharedPreferences("username", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("username", null);
         final Handler handler = new Handler(Looper.getMainLooper());
-
+        Log.d("username",username);
         new Thread() {
             @Override
             public void run() {
