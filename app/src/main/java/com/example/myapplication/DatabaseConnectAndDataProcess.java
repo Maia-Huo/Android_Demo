@@ -272,4 +272,110 @@ public class DatabaseConnectAndDataProcess {
     public void LikesSet(int[] likes) {
         this.likes = likes;
     }
+
+
+    public ArrayList<Integer> ExamineCollect(Connection connection, String user) {
+        ArrayList<Integer> collect = new ArrayList<>();
+        synchronized (lock) {
+            // 查询是否已存在(防止重复插入)
+            String sql = "SELECT picture_num FROM collect WHERE user = ?;";
+            PreparedStatement statement = null;
+            try {
+                statement = connection.prepareStatement(sql);
+                statement.setString(1, user);
+                ResultSet resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+                    collect.add(resultSet.getInt("picture_num"));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return collect;
+    }
+
+
+    public boolean InsertCollect(Connection connection, String user, int num) {
+        synchronized (lock) {
+
+            PreparedStatement statement = null;
+            String sql = "INSERT INTO collect(user,picture_num,sign) VALUES (?,?,?)";
+            statement = null;
+            try {
+                // 开始事务
+                connection.setAutoCommit(false);
+                statement = connection.prepareStatement(sql);
+                statement.setString(1, user);
+                statement.setInt(2, num);
+                statement.setString(3, user + num);
+                statement.executeUpdate();
+
+                // 提交事务
+                connection.commit();
+            } catch (SQLException e) {
+                // 回滚事务
+                try {
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    if (statement != null) {
+                        statement.close();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                // 释放连接
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return true;
+    }
+
+    public void DeleteCollect(Connection connection, String username, int id) {
+        synchronized (lock) {
+            String sql = "DELETE FROM collect WHERE user = ? AND picture_num = ?";
+            PreparedStatement statement = null;
+            try {
+                // 开始事务
+                connection.setAutoCommit(false);
+                statement = connection.prepareStatement(sql);
+                statement.setString(1, username);
+                statement.setInt(2, id);
+                statement.executeUpdate();
+
+                // 提交事务
+                connection.commit();
+            } catch (SQLException e) {
+                // 回滚事务
+                try {
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    if (statement != null) {
+                        statement.close();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                // 释放连接
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

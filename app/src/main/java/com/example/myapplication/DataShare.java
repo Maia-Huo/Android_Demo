@@ -15,8 +15,13 @@ import androidx.lifecycle.ViewModel;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class DataShare extends ViewModel {
     private MutableLiveData<DatabaseConnectAndDataProcess> databaseConnectAndDataProcessLiveData;
@@ -38,6 +43,7 @@ public class DataShare extends ViewModel {
     private MutableLiveData<List<PhotoItem>> photoItemListLiveData;
     private DatabaseConnectAndDataProcess databaseConnectAndDataProcess;
     private Connection connection;
+    String username;
 
     public DataShare() {
 
@@ -51,11 +57,21 @@ public class DataShare extends ViewModel {
 
                 setDatabaseConnectAndDataProcess(databaseConnectAndDataProcess);
                 setConnection(connection);
+
+                //检查点赞状态
+                ExamineCollect();
+                //获取图片列表
                 setPhotoItemList(databaseConnectAndDataProcess);
+
                 NewPersonData();
+
             }
         };
         thread.start();
+
+        //读取SharedPreferences中保存的账号
+        SharedPreferences sharedPreferences = MainActivity_.Context.getSharedPreferences("username", Context.MODE_PRIVATE);
+        username = sharedPreferences.getString("username", null);
     }
 
     public LiveData<DatabaseConnectAndDataProcess> getDatabaseConnectAndDataProcess() {
@@ -79,11 +95,7 @@ public class DataShare extends ViewModel {
     private MutableLiveData<List<Bitmap>> bitmapsLiveData = new MutableLiveData<>();
 
     public void NewPersonData() {
-        //读取SharedPreferences中保存的账号
-        SharedPreferences sharedPreferences = MainActivity_.Context.getSharedPreferences("username", Context.MODE_PRIVATE);
-        String username = sharedPreferences.getString("username", null);
         final Handler handler = new Handler(Looper.getMainLooper());
-        Log.d("username",username);
         new Thread() {
             @Override
             public void run() {
@@ -123,5 +135,59 @@ public class DataShare extends ViewModel {
         setPhotoItemList(databaseConnectAndDataProcess);
     }
 
+    public void updateLikes(int id, int newLikes) {
+        new Thread() {
+            @Override
+            public void run() {
+                databaseConnectAndDataProcess.updateLikes(connection, id, newLikes);
+            }
+        }.start();
+    }
 
+
+    private MutableLiveData<ArrayList<Integer>> collectLiveData = new MutableLiveData<>();
+
+    public LiveData<ArrayList<Integer>> getCollect() {
+        return collectLiveData;
+    }
+
+    ArrayList<Integer> collect1 = new ArrayList<>();
+
+    public ArrayList<Integer> getCollectValue() {
+        return collect1;
+    }
+
+    public void ExamineCollect() {
+        final Handler handlers = new Handler(Looper.getMainLooper());
+
+        new Thread(() -> {
+            ArrayList<Integer> collect = databaseConnectAndDataProcess.ExamineCollect(connection, username);
+            Log.d("DataShare", "ExamineCollect: " + collect.size());
+            handlers.post(() -> {
+                collectLiveData.postValue(collect);
+                collect1.addAll(collect);
+            });
+        }).start();
+    }
+
+    public boolean isCollect(int id) {
+        return collect1.contains(id);
+    }
+    public void InsertCollect(int num) {
+        new Thread() {
+            @Override
+            public void run() {
+                databaseConnectAndDataProcess.InsertCollect(connection, username, num);
+            }
+        }.start();
+    }
+
+    public void DeleteCollect(int id) {
+        new Thread() {
+            @Override
+            public void run() {
+                databaseConnectAndDataProcess.DeleteCollect(connection, username, id);
+            }
+        }.start();
+    }
 }

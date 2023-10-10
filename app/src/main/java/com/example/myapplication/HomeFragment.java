@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,18 +36,31 @@ public class HomeFragment extends Fragment {
         galleryAdapter = new GalleryAdapter(photoItemList);
         photoGallery.setAdapter(galleryAdapter);
 
+
         // 在这里添加获取ViewModel的逻辑
         DataShare dataShare = new ViewModelProvider(requireActivity()).get(DataShare.class);
+        ArrayList<Integer> collect = new ArrayList<>();
+
+        dataShare.getCollect().observe(requireActivity(), collect1 -> {
+                collect.clear();
+                collect.addAll(collect1);
+                dataShare.getCollect().removeObservers(requireActivity());
+        });
 
         dataShare.getPhotoItemList().observe(requireActivity(), photoItemList1 -> {
-            Log.d("HomeFragment", "onChanged: " + photoItemList1.size());
+            Log.d("HomeFragment", "onChanged2: " + photoItemList1.size());
             photoItemList.clear();
             // 更新全局变量的值
             for (int i = photoItemList1.size() - 1; i >= 0; i--) {
-                photoItemList.add(photoItemList1.get(i));
+                PhotoItem photoItem = new PhotoItem(photoItemList1.get(i).getImageBitmap(), photoItemList1.get(i).getAuthor(), photoItemList1.get(i).getComment(), photoItemList1.get(i).getLikes(), photoItemList1.get(i).getId());
+                if (collect.contains(photoItem.getId())) {
+                    photoItem.setLiked(true);
+                }
+                photoItemList.add(photoItem);
             }
             galleryAdapter.notifyDataSetChanged(); // 通知适配器刷新数据
         });
+
 
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(() -> {
@@ -58,4 +72,5 @@ public class HomeFragment extends Fragment {
         });
         return view;
     }
+
 }
