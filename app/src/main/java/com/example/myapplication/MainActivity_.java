@@ -29,6 +29,10 @@ public class MainActivity_ extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
         Context = this;
+
+        dataShare = new ViewModelProvider(this).get(DataShare.class);
+        dataShare.SetContext(this);
+
         // 绑定控件
         Button button1 = findViewById(R.id.button1);
         Button button2 = findViewById(R.id.button2);
@@ -39,9 +43,6 @@ public class MainActivity_ extends AppCompatActivity implements View.OnClickList
         button3.setOnClickListener(this);
 
         replaceFragment(new HomeFragment()); // Move this line here.
-
-        dataShare = new ViewModelProvider(this).get(DataShare.class);
-        dataShare.SetContext(this);
 
     }
 

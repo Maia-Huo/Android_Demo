@@ -42,9 +42,8 @@ public class HomeFragment extends Fragment {
         ArrayList<Integer> collect = new ArrayList<>();
 
         dataShare.getCollect().observe(requireActivity(), collect1 -> {
-                collect.clear();
-                collect.addAll(collect1);
-                dataShare.getCollect().removeObservers(requireActivity());
+            collect.clear();
+            collect.addAll(collect1);
         });
 
         dataShare.getPhotoItemList().observe(requireActivity(), photoItemList1 -> {
@@ -58,6 +57,7 @@ public class HomeFragment extends Fragment {
                 }
                 photoItemList.add(photoItem);
             }
+            collect.clear();
             galleryAdapter.notifyDataSetChanged(); // 通知适配器刷新数据
         });
 
@@ -67,6 +67,7 @@ public class HomeFragment extends Fragment {
             new Thread(() -> {
                 // 重新获取数据
                 dataShare.ReGet();
+                dataShare.ExamineCollect();
             }).start();
             swipeRefreshLayout.setRefreshing(false);
         });

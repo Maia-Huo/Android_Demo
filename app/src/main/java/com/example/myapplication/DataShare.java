@@ -46,29 +46,28 @@ public class DataShare extends ViewModel {
     String username;
 
     public DataShare() {
-
+        //初始化LiveData
         databaseConnectAndDataProcessLiveData = new MutableLiveData<>();
         photoItemListLiveData = new MutableLiveData<>();
+        //创建线程
         Thread thread = new Thread() {
             @Override
             public void run() {
+                //创建数据库连接和数据处理对象
                 databaseConnectAndDataProcess = new DatabaseConnectAndDataProcess();
                 connection = databaseConnectAndDataProcess.Connect();
-
+                //将数据库连接和数据处理对象传递给LiveData
                 setDatabaseConnectAndDataProcess(databaseConnectAndDataProcess);
                 setConnection(connection);
-
                 //检查点赞状态
                 ExamineCollect();
                 //获取图片列表
                 setPhotoItemList(databaseConnectAndDataProcess);
-
+                //获取点赞数据
                 NewPersonData();
-
             }
         };
         thread.start();
-
         //读取SharedPreferences中保存的账号
         SharedPreferences sharedPreferences = MainActivity_.Context.getSharedPreferences("username", Context.MODE_PRIVATE);
         username = sharedPreferences.getString("username", null);
@@ -173,6 +172,7 @@ public class DataShare extends ViewModel {
     public boolean isCollect(int id) {
         return collect1.contains(id);
     }
+
     public void InsertCollect(int num) {
         new Thread() {
             @Override

@@ -100,7 +100,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
                 // 更新点赞数
                 int newLikes = photoItem.isLiked() ? photoItem.getLikes() + 1 : photoItem.getLikes() - 1;
-                notifyDataSetChanged();
+
                 photoItem.setLikes(newLikes);
 
                 // 更新数据库点赞状态
@@ -112,7 +112,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
                 // 更新数据库中的点赞数
                 dataShare.updateLikes(photoItem.getId(), newLikes);
-
+                notifyDataSetChanged();
                 SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("likes", 0);
                 sharedPreferences.edit().putInt("likes", newLikes).apply();
                 sharedPreferences.edit().putInt("num", photoItem.getId()).apply();
